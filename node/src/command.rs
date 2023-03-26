@@ -5,10 +5,10 @@ use crate::{
 	service,
 };
 use frame_benchmarking_cli::{BenchmarkCmd, ExtrinsicFactory, SUBSTRATE_REFERENCE_HARDWARE};
+use node_template::chain_spec::get_account_id_from_seed;
 use node_template_runtime::{Block, EXISTENTIAL_DEPOSIT};
 use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
-use sp_keyring::Sr25519Keyring;
 
 #[cfg(feature = "try-runtime")]
 use try_runtime_cli::block_building_info::timestamp_with_aura_info;
@@ -163,7 +163,7 @@ pub fn run() -> sc_cli::Result<()> {
 							Box::new(RemarkBuilder::new(client.clone())),
 							Box::new(TransferKeepAliveBuilder::new(
 								client.clone(),
-								Sr25519Keyring::Alice.to_account_id(),
+								get_account_id_from_seed::<sp_core::ecdsa::Public>("Alice"),
 								EXISTENTIAL_DEPOSIT,
 							)),
 						]);

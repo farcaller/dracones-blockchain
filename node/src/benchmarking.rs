@@ -4,13 +4,13 @@
 
 use crate::service::FullClient;
 
+use fp_account::AccountId20;
 use node_template_runtime as runtime;
 use runtime::{AccountId, Balance, BalancesCall, SystemCall};
 use sc_cli::Result;
 use sc_client_api::BlockBackend;
-use sp_core::{Encode, Pair};
+use sp_core::{ecdsa, Encode, Pair};
 use sp_inherents::{InherentData, InherentDataProvider};
-use sp_keyring::Sr25519Keyring;
 use sp_runtime::{OpaqueExtrinsic, SaturatedConversion};
 
 use std::{sync::Arc, time::Duration};
@@ -39,7 +39,7 @@ impl frame_benchmarking_cli::ExtrinsicBuilder for RemarkBuilder {
 	}
 
 	fn build(&self, nonce: u32) -> std::result::Result<OpaqueExtrinsic, &'static str> {
-		let acc = Sr25519Keyring::Bob.pair();
+		let acc = ecdsa::Pair::from_string("//Bob", None).expect("static values are valid; qed");
 		let extrinsic: OpaqueExtrinsic = create_benchmark_extrinsic(
 			self.client.as_ref(),
 			acc,
@@ -78,7 +78,7 @@ impl frame_benchmarking_cli::ExtrinsicBuilder for TransferKeepAliveBuilder {
 	}
 
 	fn build(&self, nonce: u32) -> std::result::Result<OpaqueExtrinsic, &'static str> {
-		let acc = Sr25519Keyring::Bob.pair();
+		let acc = ecdsa::Pair::from_string("//Bob", None).expect("static values are valid; qed");
 		let extrinsic: OpaqueExtrinsic = create_benchmark_extrinsic(
 			self.client.as_ref(),
 			acc,
@@ -100,7 +100,7 @@ impl frame_benchmarking_cli::ExtrinsicBuilder for TransferKeepAliveBuilder {
 /// Note: Should only be used for benchmarking.
 pub fn create_benchmark_extrinsic(
 	client: &FullClient,
-	sender: sp_core::sr25519::Pair,
+	sender: ecdsa::Pair,
 	call: runtime::RuntimeCall,
 	nonce: u32,
 ) -> runtime::UncheckedExtrinsic {
@@ -144,8 +144,8 @@ pub fn create_benchmark_extrinsic(
 
 	runtime::UncheckedExtrinsic::new_signed(
 		call.clone(),
-		sp_runtime::AccountId32::from(sender.public()).into(),
-		runtime::Signature::Sr25519(signature.clone()),
+		AccountId20::from(sender.public()).into(),
+		runtime::Signature::new(signature.clone()),
 		extra.clone(),
 	)
 }
