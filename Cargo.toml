@@ -2,7 +2,10 @@
 members = [
     "node",
     "pallets/template",
+    "pallets/raft",
+    "primitives/raft-seal",
     "runtime",
+	"client/raft-seal"
 ]
 [profile.release]
 panic = "unwind"
