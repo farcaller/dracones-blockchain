@@ -62,7 +62,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 				// Initial PoA authorities
 				vec![get_from_seed::<RaftId>("Raft")],
 				// Sudo account
-				get_account_id_from_seed::<ecdsa::Public>("Alice"),
+				accounts[0],
 				// Pre-funded accounts
 				accounts,
 				true,
