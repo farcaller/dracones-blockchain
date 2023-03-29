@@ -9,3 +9,37 @@ members = [
 ]
 [profile.release]
 panic = "unwind"
+
+[workspace.dependencies]
+frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+sc-network = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+sp-offchain = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+sp-session = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+
+# git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.39"
+
+fc-cli = { path = "/home/nixos/src/thirdparty/frontier/client/cli" }
+fc-consensus = { path = "/home/nixos/src/thirdparty/frontier/client/consensus" }
+fc-db = { path = "/home/nixos/src/thirdparty/frontier/client/db" }
+fc-mapping-sync = { path = "/home/nixos/src/thirdparty/frontier/client/mapping-sync" }
+fc-rpc = { path = "/home/nixos/src/thirdparty/frontier/client/rpc" }
+fc-rpc-core = { path = "/home/nixos/src/thirdparty/frontier/client/rpc-core" }
+fc-storage = { path = "/home/nixos/src/thirdparty/frontier/client/storage" }
+fp-account = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/primitives/account" }
+fp-dynamic-fee = { path = "/home/nixos/src/thirdparty/frontier/primitives/dynamic-fee", features = ["default"] }
+fp-evm = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/primitives/evm" }
+fp-rpc = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/primitives/rpc" }
+fp-self-contained = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/primitives/self-contained" }
+
+pallet-base-fee = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/frame/base-fee" }
+pallet-dynamic-fee = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/frame/dynamic-fee" }
+pallet-ethereum = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/frame/ethereum" }
+pallet-evm = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/frame/evm" }
+pallet-evm-chain-id = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/frame/evm-chain-id" }
+pallet-evm-precompile-modexp = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/frame/evm/precompile/modexp" }
+pallet-evm-precompile-sha3fips = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/frame/evm/precompile/sha3fips" }
+pallet-evm-precompile-simple = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/frame/evm/precompile/simple" }
+pallet-hotfix-sufficients = { default-features = false, path = "/home/nixos/src/thirdparty/frontier/frame/hotfix-sufficients" }
+

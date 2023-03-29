@@ -6,7 +6,9 @@ mod chain_spec;
 mod service;
 mod benchmarking;
 mod cli;
+mod client;
 mod command;
+mod eth;
 mod rpc;
 
 fn main() -> sc_cli::Result<()> {

@@ -53,7 +53,20 @@ pallet-template = { version = "4.0.0-dev", default-features = false, path = "../
 sp-consensus-raft = { version = "0.10.0-dev", default-features = false, path = "../primitives/raft-seal" }
 pallet-raft = { default-features = false, path = "../pallets/raft" }
 
-fp-account = { version = "1.0.0-dev", default-features = false, git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.39" }
+fp-account = { default-features = false, workspace = true }
+fp-evm = { default-features = false, workspace = true }
+fp-rpc = { default-features = false, workspace = true }
+fp-self-contained = { default-features = false, workspace = true }
+
+pallet-base-fee = { default-features = false, workspace = true }
+pallet-dynamic-fee = { default-features = false, workspace = true }
+pallet-ethereum = { default-features = false, workspace = true }
+pallet-evm = { default-features = false, workspace = true }
+pallet-evm-chain-id = { default-features = false, workspace = true }
+pallet-evm-precompile-modexp = { default-features = false, workspace = true }
+pallet-evm-precompile-sha3fips = { default-features = false, workspace = true }
+pallet-evm-precompile-simple = { default-features = false, workspace = true }
+pallet-hotfix-sufficients = { default-features = false, workspace = true }
 
 [build-dependencies]
 substrate-wasm-builder = { version = "5.0.0-dev", git = "https://github.com/paritytech/substrate.git", optional = true , branch = "polkadot-v0.9.39" }
@@ -65,6 +78,18 @@ std = [
 	"pallet-raft/std",
 	"sp-consensus-raft/std",
 	"fp-account/std",
+	"fp-evm/std",
+	"fp-rpc/std",
+	"fp-self-contained/std",
+	"pallet-base-fee/std",
+	"pallet-dynamic-fee/std",
+	"pallet-ethereum/std",
+	"pallet-evm/std",
+	"pallet-evm-chain-id/std",
+	"pallet-evm-precompile-modexp/std",
+	"pallet-evm-precompile-sha3fips/std",
+	"pallet-evm-precompile-simple/std",
+	"pallet-hotfix-sufficients/std",
 	"frame-try-runtime?/std",
 	"frame-system-benchmarking?/std",
 	"frame-benchmarking?/std",

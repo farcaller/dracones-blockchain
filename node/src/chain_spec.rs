@@ -1,3 +1,5 @@
+use std::{collections::BTreeMap, str::FromStr};
+
 use bip32::{
 	Error as Bip32Error, ExtendedPrivateKey, PrivateKey as PrivateKeyT, PrivateKeyBytes,
 	PublicKey as PublicKeyT, PublicKeyBytes,
@@ -6,13 +8,13 @@ use bip39::{Language, Mnemonic, Seed};
 use libsecp256k1::{PublicKey, PublicKeyFormat, SecretKey};
 use log::debug;
 use node_template_runtime::{
-	AccountId, BalancesConfig, GenesisConfig, RaftConfig, Signature, SudoConfig, SystemConfig,
-	WASM_BINARY,
+	AccountId, BalancesConfig, EVMChainIdConfig, EVMConfig, GenesisConfig, RaftConfig, Signature,
+	SudoConfig, SystemConfig, WASM_BINARY,
 };
 use sc_service::ChainType;
 use sha3::{Digest, Keccak256};
 use sp_consensus_raft::sr25519::AuthorityId as RaftId;
-use sp_core::{ecdsa, Pair, Public, H160, H256};
+use sp_core::{ecdsa, Pair, Public, H160, H256, U256};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
 // The URL for the telemetry server.
@@ -246,5 +248,74 @@ fn testnet_genesis(
 			key: Some(root_key),
 		},
 		transaction_payment: Default::default(),
+
+		// EVM compatibility
+		evm_chain_id: EVMChainIdConfig { chain_id: 8387 },
+		evm: EVMConfig {
+			accounts: {
+				let mut map = BTreeMap::new();
+				map.insert(
+					// H160 address of Alice dev account
+					// Derived from SS58 (42 prefix) address
+					// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
+					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
+					// chars)
+					H160::from_str("0x0a271Ac121d6cC80fd754b8A5a1fF19D2c628fE6")
+						.expect("internal H160 is valid; qed"),
+					fp_evm::GenesisAccount {
+						balance: U256::from_str("0xffffffffffffffffff")
+							.expect("internal U256 is valid; qed"),
+						code: Default::default(),
+						nonce: Default::default(),
+						storage: Default::default(),
+					},
+				);
+				map.insert(
+					// H160 address of Alice dev account
+					// Derived from SS58 (42 prefix) address
+					// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+					// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
+					// Using the full hex key, truncating to the first 20 bytes (the first 40 hex
+					// chars)
+					H160::from_str("d43593c715fdd31c61141abd04a99fd6822c8558")
+						.expect("internal H160 is valid; qed"),
+					fp_evm::GenesisAccount {
+						balance: U256::from_str("0xffffffffffffffffffffffffffffffff")
+							.expect("internal U256 is valid; qed"),
+						code: Default::default(),
+						nonce: Default::default(),
+						storage: Default::default(),
+					},
+				);
+				map.insert(
+					// H160 address of CI test runner account
+					H160::from_str("6be02d1d3665660d22ff9624b7be0551ee1ac91b")
+						.expect("internal H160 is valid; qed"),
+					fp_evm::GenesisAccount {
+						balance: U256::from_str("0xffffffffffffffffffffffffffffffff")
+							.expect("internal U256 is valid; qed"),
+						code: Default::default(),
+						nonce: Default::default(),
+						storage: Default::default(),
+					},
+				);
+				map.insert(
+					// H160 address for benchmark usage
+					H160::from_str("1000000000000000000000000000000000000001")
+						.expect("internal H160 is valid; qed"),
+					fp_evm::GenesisAccount {
+						nonce: U256::from(1),
+						balance: U256::from(1_000_000_000_000_000_000_000_000u128),
+						storage: Default::default(),
+						code: vec![0x00],
+					},
+				);
+				map
+			},
+		},
+		ethereum: Default::default(),
+		dynamic_fee: Default::default(),
+		base_fee: Default::default(),
 	}
 }

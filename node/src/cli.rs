@@ -1,5 +1,7 @@
 use sc_cli::RunCmd;
 
+use crate::eth::EthConfiguration;
+
 #[derive(Debug, clap::Parser)]
 pub struct Cli {
 	#[command(subcommand)]
@@ -7,6 +9,9 @@ pub struct Cli {
 
 	#[clap(flatten)]
 	pub run: RunCmd,
+
+	#[command(flatten)]
+	pub eth: EthConfiguration,
 }
 
 #[derive(Debug, clap::Subcommand)]

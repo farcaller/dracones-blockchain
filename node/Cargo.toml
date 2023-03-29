@@ -67,13 +67,32 @@ node-template-runtime = { version = "4.0.0-dev", path = "../runtime" }
 # CLI-specific dependencies
 try-runtime-cli = { version = "0.10.0-dev", optional = true, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
 
-fp-account = { version = "1.0.0-dev", git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.39" }
 hex-literal = "0.3.4"
 log = "0.4.17"
 tiny-bip39 = "1.0.0"
 bip32 = "0.4.0"
 libsecp256k1 = "0.7.1"
 sha3 = "0.10.6"
+
+fp-account = { workspace = true }
+fc-cli = { workspace = true }
+fc-consensus = { workspace = true }
+fc-db = { workspace = true }
+fc-mapping-sync = { workspace = true }
+fc-rpc = { workspace = true }
+fc-rpc-core = { workspace = true }
+fc-storage = { workspace = true }
+fp-dynamic-fee = { workspace = true, features = ["default"] }
+fp-evm = { workspace = true, features = ["default"] }
+fp-rpc = { workspace = true, features = ["default"] }
+sp-offchain = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+sp-session = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+sc-network = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+async-trait = "0.1.68"
+
 
 [build-dependencies]
 substrate-build-script-utils = { version = "3.0.0", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
