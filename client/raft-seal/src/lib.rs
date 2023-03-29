@@ -50,13 +50,13 @@ pub mod rpc;
 
 pub use self::{
 	consensus::ConsensusDataProvider,
-	error::Error,
+	error::{raft_err, Error},
 	finalize_block::{finalize_block, FinalizeBlockParams},
 	rpc::{CreatedBlock, EngineCommand},
 	seal_block::{seal_block, SealBlockParams, MAX_PROPOSAL_DURATION},
 };
 use sc_transaction_pool_api::TransactionPool;
-use sp_api::{ProvideRuntimeApi, TransactionFor};
+use sp_api::{HeaderT, ProvideRuntimeApi, TransactionFor};
 
 const LOG_TARGET: &str = "raft-seal";
 
@@ -72,6 +72,18 @@ impl<B: BlockT> Verifier<B> for ManualSealVerifier {
 		&mut self,
 		mut block: BlockImportParams<B, ()>,
 	) -> Result<(BlockImportParams<B, ()>, Option<Vec<(CacheKeyId, Vec<u8>)>>), String> {
+		let hash = block.header.hash();
+		let seal = block.header.digest_mut().pop().ok_or(Error::<B>::HeaderUnsealed(hash));
+		if let Err(e) = seal {
+			return Err(format!("{}", e))
+		}
+		let seal = seal.unwrap();
+		// TODO: it'd be nice to actually verify the seal heh.
+		// let sig = seal.as_raft_seal().ok_or_else(|| raft_err(Error::HeaderBadSeal(hash)))?;
+
+		block.post_digests.push(seal);
+		block.post_hash = Some(hash);
+
 		block.finalized = false;
 		block.fork_choice = Some(ForkChoiceStrategy::LongestChain);
 		Ok((block, None))
@@ -177,7 +189,7 @@ pub async fn run_manual_seal<B, BI, CB, E, C, TP, SC, CS, CIDP, P, PP>(
 	CB: ClientBackend<B> + 'static,
 	E: Environment<B> + 'static,
 	E::Proposer: Proposer<B, Proof = P, Transaction = TransactionFor<C, B>>,
-	CS: Stream<Item = EngineCommand<<B as BlockT>::Hash>> + Unpin + 'static,
+	CS: Stream<Item = EngineCommand<<B as BlockT>::Hash, B>> + Unpin + 'static,
 	SC: SelectChain<B> + 'static,
 	TransactionFor<C, B>: 'static,
 	TP: TransactionPool<Block = B>,
@@ -281,7 +293,7 @@ pub async fn run_instant_seal<B, BI, CB, E, C, TP, SC, CIDP, P, PP>(
 
 pub async fn run_instant_seal_delayed<B, TP>(
 	pool: Arc<TP>,
-	mut sender: futures::channel::mpsc::Sender<EngineCommand<<B as BlockT>::Hash>>,
+	mut sender: futures::channel::mpsc::Sender<EngineCommand<<B as BlockT>::Hash, B>>,
 ) where
 	B: BlockT + 'static,
 	TP: TransactionPool<Block = B>,

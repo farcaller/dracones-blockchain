@@ -29,13 +29,14 @@ use jsonrpsee::{
 };
 use sc_consensus::ImportedAux;
 use serde::{Deserialize, Serialize};
+use sp_api::BlockT;
 use sp_runtime::EncodedJustification;
 
 /// Sender passed to the authorship task to report errors or successes.
-pub type Sender<T> = Option<oneshot::Sender<std::result::Result<T, Error>>>;
+pub type Sender<T, B> = Option<oneshot::Sender<std::result::Result<T, Error<B>>>>;
 
 /// Message sent to the background authorship task, usually by RPC.
-pub enum EngineCommand<Hash> {
+pub enum EngineCommand<Hash, B: BlockT> {
 	/// Tells the engine to propose a new block
 	///
 	/// if create_empty == true, it will create empty blocks if there are no transactions
@@ -51,14 +52,14 @@ pub enum EngineCommand<Hash> {
 		/// specify the parent hash of the about-to-created block
 		parent_hash: Option<Hash>,
 		/// sender to report errors/success to the rpc.
-		sender: Sender<CreatedBlock<Hash>>,
+		sender: Sender<CreatedBlock<Hash>, B>,
 	},
 	/// Tells the engine to finalize the block with the supplied hash
 	FinalizeBlock {
 		/// hash of the block
 		hash: Hash,
 		/// sender to report errors/success to the rpc.
-		sender: Sender<()>,
+		sender: Sender<(), B>,
 		/// finalization justification
 		justification: Option<EncodedJustification>,
 	},
@@ -86,8 +87,8 @@ pub trait ManualSealApi<Hash> {
 }
 
 /// A struct that implements the [`ManualSealApiServer`].
-pub struct ManualSeal<Hash> {
-	import_block_channel: mpsc::Sender<EngineCommand<Hash>>,
+pub struct ManualSeal<Hash, B: BlockT> {
+	import_block_channel: mpsc::Sender<EngineCommand<Hash, B>>,
 }
 
 /// return type of `engine_createBlock`
@@ -99,15 +100,15 @@ pub struct CreatedBlock<Hash> {
 	pub aux: ImportedAux,
 }
 
-impl<Hash> ManualSeal<Hash> {
+impl<Hash, B: BlockT> ManualSeal<Hash, B> {
 	/// Create new `ManualSeal` with the given reference to the client.
-	pub fn new(import_block_channel: mpsc::Sender<EngineCommand<Hash>>) -> Self {
+	pub fn new(import_block_channel: mpsc::Sender<EngineCommand<Hash, B>>) -> Self {
 		Self { import_block_channel }
 	}
 }
 
 #[async_trait]
-impl<Hash: Send + 'static> ManualSealApiServer<Hash> for ManualSeal<Hash> {
+impl<Hash: Send + 'static, B: BlockT> ManualSealApiServer<Hash> for ManualSeal<Hash, B> {
 	async fn create_block(
 		&self,
 		create_empty: bool,
@@ -148,9 +149,9 @@ impl<Hash: Send + 'static> ManualSealApiServer<Hash> for ManualSeal<Hash> {
 
 /// report any errors or successes encountered by the authorship task back
 /// to the rpc
-pub fn send_result<T: std::fmt::Debug>(
-	sender: &mut Sender<T>,
-	result: std::result::Result<T, crate::Error>,
+pub fn send_result<T: std::fmt::Debug, B: BlockT>(
+	sender: &mut Sender<T, B>,
+	result: std::result::Result<T, crate::Error<B>>,
 ) {
 	if let Some(sender) = sender.take() {
 		if let Err(err) = sender.send(result) {

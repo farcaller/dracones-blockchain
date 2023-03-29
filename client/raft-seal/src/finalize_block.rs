@@ -28,7 +28,7 @@ pub struct FinalizeBlockParams<B: BlockT, F, CB> {
 	/// hash of the block
 	pub hash: <B as BlockT>::Hash,
 	/// sender to report errors/success to the rpc.
-	pub sender: rpc::Sender<()>,
+	pub sender: rpc::Sender<(), B>,
 	/// finalization justification
 	pub justification: Option<Justification>,
 	/// Finalizer trait object.

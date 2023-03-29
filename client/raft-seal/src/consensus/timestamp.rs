@@ -53,52 +53,15 @@ pub struct SlotTimestampProvider {
 }
 
 impl SlotTimestampProvider {
-	/// Create a new mocked time stamp provider, for babe.
-	pub fn new_babe<B, C>(client: Arc<C>) -> Result<Self, Error>
-	where
-		B: BlockT,
-		C: AuxStore + HeaderBackend<B> + ProvideRuntimeApi<B> + UsageProvider<B>,
-		C::Api: BabeApi<B>,
-	{
-		let slot_duration = sc_consensus_babe::configuration(&*client)?.slot_duration();
-
-		let time = Self::with_header(&client, slot_duration, |header| {
-			let slot_number = *sc_consensus_babe::find_pre_digest::<B>(&header)
-				.map_err(|err| format!("{}", err))?
-				.slot();
-			Ok(slot_number)
-		})?;
-
-		Ok(Self { unix_millis: atomic::AtomicU64::new(time), slot_duration })
-	}
-
-	/// Create a new mocked time stamp provider, for aura
-	pub fn new_aura<B, C>(client: Arc<C>) -> Result<Self, Error>
-	where
-		B: BlockT,
-		C: AuxStore + HeaderBackend<B> + ProvideRuntimeApi<B> + UsageProvider<B>,
-		C::Api: AuraApi<B, AuthorityId>,
-	{
-		let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
-
-		let time = Self::with_header(&client, slot_duration, |header| {
-			let slot_number = *sc_consensus_aura::find_pre_digest::<B, AuthoritySignature>(&header)
-				.map_err(|err| format!("{}", err))?;
-			Ok(slot_number)
-		})?;
-
-		Ok(Self { unix_millis: atomic::AtomicU64::new(time), slot_duration })
-	}
-
 	fn with_header<F, C, B>(
 		client: &Arc<C>,
 		slot_duration: SlotDuration,
 		func: F,
-	) -> Result<u64, Error>
+	) -> Result<u64, Error<B>>
 	where
 		B: BlockT,
 		C: AuxStore + HeaderBackend<B> + UsageProvider<B>,
-		F: Fn(B::Header) -> Result<u64, Error>,
+		F: Fn(B::Header) -> Result<u64, Error<B>>,
 	{
 		let info = client.info();
 

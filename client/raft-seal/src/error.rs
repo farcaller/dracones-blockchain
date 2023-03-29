@@ -25,6 +25,7 @@ use jsonrpsee::{
 	types::error::{CallError, ErrorObject},
 };
 use sc_consensus::ImportResult;
+use sp_api::BlockT;
 use sp_blockchain::Error as BlockchainError;
 use sp_consensus::Error as ConsensusError;
 use sp_inherents::Error as InherentsError;
@@ -43,7 +44,7 @@ mod codes {
 
 /// errors encountered by background block authorship task
 #[derive(Debug, thiserror::Error)]
-pub enum Error {
+pub enum Error<B: BlockT> {
 	/// An error occurred while importing the block
 	#[error("Block import failed: {0:?}")]
 	BlockImportError(ImportResult),
@@ -73,24 +74,30 @@ pub enum Error {
 	/// send error
 	#[error("Consensus process is terminating")]
 	SendError(#[from] SendError),
+	/// Header is unsealed
+	#[error("Header {0:?} is unsealed")]
+	HeaderUnsealed(B::Hash),
+	/// Header has a bad seal
+	#[error("Header {0:?} has a bad seal")]
+	HeaderBadSeal(B::Hash),
 	/// Some other error.
 	#[error("Other error: {0}")]
 	Other(Box<dyn std::error::Error + Send + Sync>),
 }
 
-impl From<ImportResult> for Error {
+impl<B: BlockT> From<ImportResult> for Error<B> {
 	fn from(err: ImportResult) -> Self {
 		Error::BlockImportError(err)
 	}
 }
 
-impl From<String> for Error {
+impl<B: BlockT> From<String> for Error<B> {
 	fn from(s: String) -> Self {
 		Error::StringError(s)
 	}
 }
 
-impl Error {
+impl<B: BlockT> Error<B> {
 	fn to_code(&self) -> i32 {
 		use Error::*;
 		match self {
@@ -106,8 +113,13 @@ impl Error {
 	}
 }
 
-impl From<Error> for JsonRpseeError {
-	fn from(err: Error) -> Self {
+impl<B: BlockT> From<Error<B>> for JsonRpseeError {
+	fn from(err: Error<B>) -> Self {
 		CallError::Custom(ErrorObject::owned(err.to_code(), err.to_string(), None::<()>)).into()
 	}
+}
+
+pub fn raft_err<B: BlockT>(error: Error<B>) -> Error<B> {
+	log::debug!(target: "raft", "{}", error);
+	error
 }

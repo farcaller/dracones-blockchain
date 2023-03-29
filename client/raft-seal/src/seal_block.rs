@@ -52,7 +52,7 @@ pub struct SealBlockParams<'a, B: BlockT, BI, SC, C: ProvideRuntimeApi<B>, E, TP
 	/// specify the parent hash of the about-to-created block
 	pub parent_hash: Option<<B as BlockT>::Hash>,
 	/// sender to report errors/success to the rpc.
-	pub sender: rpc::Sender<CreatedBlock<<B as BlockT>::Hash>>,
+	pub sender: rpc::Sender<CreatedBlock<<B as BlockT>::Hash>, B>,
 	/// transaction pool
 	pub pool: Arc<TP>,
 	/// header backend
