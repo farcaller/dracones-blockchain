@@ -14,7 +14,7 @@ use sc_consensus::BoxBlockImport;
 pub use sc_executor::NativeElseWasmExecutor;
 use sc_executor::NativeExecutionDispatch;
 use sc_keystore::LocalKeystore;
-use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
+use sc_service::{error::Error as ServiceError, ChainType, Configuration, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sc_transaction_pool::FullPool;
 use sp_api::ConstructRuntimeApi;
@@ -189,6 +189,16 @@ pub fn new_full(
 	let role = config.role.clone();
 	let prometheus_registry = config.prometheus_registry().cloned();
 
+	if config.chain_spec.chain_type() == ChainType::Development {
+		let store = keystore_container.sync_keystore();
+		sp_keystore::SyncCryptoStore::sr25519_generate_new(
+			store.as_ref(),
+			sp_consensus_raft::RAFT_KEY_TYPE,
+			Some("//Raft"),
+		)
+		.expect("failed to inject a raft sealing key");
+	}
+
 	config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));
 	let overrides = crate::rpc::overrides_handle(client.clone());
 	let eth_rpc_params = crate::rpc::EthDeps {
@@ -263,14 +273,6 @@ pub fn new_full(
 			prometheus_registry.as_ref(),
 			telemetry.as_ref().map(|x| x.handle()),
 		);
-
-		let store = keystore_container.sync_keystore();
-		let res = sp_keystore::SyncCryptoStore::sr25519_generate_new(
-			store.as_ref(),
-			sp_consensus_raft::RAFT_KEY_TYPE,
-			Some("//Raft"),
-		)
-		.unwrap();
 
 		let (commands_stream_tx, commands_stream_rx) = futures::channel::mpsc::channel(100);
 
