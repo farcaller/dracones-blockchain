@@ -7,8 +7,8 @@ use crate::{
 		FrontierBackend, FrontierBlockImport, FrontierPartialComponents,
 	},
 };
+use dracones_runtime::{self, opaque::Block, Hash, RuntimeApi, TransactionConverter};
 use futures::channel::mpsc;
-use node_template_runtime::{self, opaque::Block, Hash, RuntimeApi, TransactionConverter};
 use sc_client_api::StateBackendFor;
 use sc_consensus::BoxBlockImport;
 pub use sc_executor::NativeElseWasmExecutor;
@@ -34,11 +34,11 @@ impl sc_executor::NativeExecutionDispatch for ExecutorDispatch {
 	type ExtendHostFunctions = ();
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
-		node_template_runtime::api::dispatch(method, data)
+		dracones_runtime::api::dispatch(method, data)
 	}
 
 	fn native_version() -> sc_executor::NativeVersion {
-		node_template_runtime::native_version()
+		dracones_runtime::native_version()
 	}
 }
 

@@ -4,9 +4,9 @@ use crate::{
 	cli::{Cli, Subcommand},
 	service,
 };
+use dracones_node::chain_spec::get_account_id_from_seed;
+use dracones_runtime::{Block, EXISTENTIAL_DEPOSIT};
 use frame_benchmarking_cli::{BenchmarkCmd, ExtrinsicFactory, SUBSTRATE_REFERENCE_HARDWARE};
-use node_template::chain_spec::get_account_id_from_seed;
-use node_template_runtime::{Block, EXISTENTIAL_DEPOSIT};
 use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
 
@@ -48,7 +48,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-		&node_template_runtime::VERSION
+		&dracones_runtime::VERSION
 	}
 }
 
