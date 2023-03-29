@@ -171,16 +171,24 @@ pub async fn seal_block<B, BI, SC, C, E, TP, CIDP, P, PP>(
 
 		let mut key: Option<AuthorityId<PP>> = None;
 
-		for a in authorities {
+		for a in &authorities {
 			let exists =
 				keystore.has_keys(&[(a.to_raw_vec(), sp_consensus_raft::RAFT_KEY_TYPE)]).await;
 			if exists {
-				key = Some(a);
+				key = Some(a.clone());
 				break
 			}
 		}
 
-		let key = key.ok_or(sp_consensus::Error::InvalidAuthoritiesSet)?;
+		let key = key.ok_or_else(|| {
+			sp_consensus::Error::CannotSign(
+				vec![],
+				format!(
+					"Could not find key in keystore that would match any known authority: {:?}",
+					authorities
+				),
+			)
+		})?;
 
 		let public_type_pair = key.to_public_crypto_pair();
 		let public = key.to_raw_vec();
