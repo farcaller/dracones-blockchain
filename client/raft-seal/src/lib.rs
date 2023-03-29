@@ -314,6 +314,35 @@ pub async fn run_instant_seal_delayed<B, TP>(
 		}
 		log::info!(target: LOG_TARGET, "seal delays until next batch");
 		tokio::time::sleep(Duration::from_secs(6)).await;
+		if pool.status().ready > 0 {
+			log::warn!("playing a catch-up as there's a stuck transaction!");
+			loop {
+				let res = sender
+					.send(EngineCommand::SealNewBlock {
+						create_empty: false,
+						finalize: false,
+						parent_hash: None,
+						sender: None,
+					})
+					.await;
+				log::warn!("sent {:?}", res);
+				match res {
+					Ok(()) => break,
+					Err(e) =>
+						if e.is_full() {
+							log::warn!(
+								target: LOG_TARGET,
+								"send command queue is full, will wait and retry"
+							);
+							tokio::time::sleep(Duration::from_secs(6)).await;
+							continue
+						} else {
+							log::error!(target: LOG_TARGET, "failed to send to command queue: {e}");
+							return
+						},
+				}
+			}
+		}
 	}
 }
 

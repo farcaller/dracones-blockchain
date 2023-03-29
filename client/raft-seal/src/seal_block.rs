@@ -164,18 +164,10 @@ pub async fn seal_block<B, BI, SC, C, E, TP, CIDP, P, PP>(
 
 		let runtime_api = client.runtime_api();
 
-		log::warn!("** looking for authorities");
-
-		let apires = runtime_api.authorities(parent.hash());
-
-		log::warn!("** api returned {:?}", apires);
-
 		let authorities: Vec<AuthorityId<PP>> = runtime_api
 			.authorities(parent.hash())
 			.ok()
 			.ok_or(sp_consensus::Error::InvalidAuthoritiesSet)?;
-
-		log::warn!("** got autorities {:?}", authorities);
 
 		let mut key: Option<AuthorityId<PP>> = None;
 
@@ -187,8 +179,6 @@ pub async fn seal_block<B, BI, SC, C, E, TP, CIDP, P, PP>(
 				break
 			}
 		}
-
-		log::warn!("** got key {:?}", key);
 
 		let key = key.ok_or(sp_consensus::Error::InvalidAuthoritiesSet)?;
 
