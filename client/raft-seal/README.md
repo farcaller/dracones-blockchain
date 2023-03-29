@@ -1,4 +1,3 @@
-A manual sealing engine: the engine listens for rpc calls to seal blocks and create forks.
-This is suitable for a testing environment.
+A raft sealing engine. Forked off the manual sealing engine of substrate.
 
 License: GPL-3.0-or-later WITH Classpath-exception-2.0

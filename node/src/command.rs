@@ -4,9 +4,9 @@ use crate::{
 	cli::{Cli, Subcommand},
 	service,
 };
-use dracones_node::chain_spec::get_account_id_from_seed;
 use dracones_runtime::{Block, EXISTENTIAL_DEPOSIT};
 use frame_benchmarking_cli::{BenchmarkCmd, ExtrinsicFactory, SUBSTRATE_REFERENCE_HARDWARE};
+use node_dracones::chain_spec::get_account_id_from_seed;
 use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
 
