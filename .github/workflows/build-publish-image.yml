@@ -18,7 +18,7 @@ on:
 
 # Set an environment variable (that can be overriden) for the Docker Repo
 env:
-  DOCKER_REPO: gchr.io/farcaller/dracones-blockchain
+  DOCKER_REPO: ghcr.io/farcaller/dracones-blockchain
 
 permissions:
   packages: write
