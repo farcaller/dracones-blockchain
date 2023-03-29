@@ -11,7 +11,8 @@ use dracones_runtime::{
 };
 use libsecp256k1::{PublicKey, PublicKeyFormat, SecretKey};
 use log::debug;
-use sc_service::ChainType;
+use sc_service::{config::MultiaddrWithPeerId, ChainType};
+use sc_telemetry::serde_json::json;
 use sha3::{Digest, Keccak256};
 use sp_consensus_raft::sr25519::AuthorityId as RaftId;
 use sp_core::{ecdsa, Pair, Public, H160, H256, U256};
@@ -212,14 +213,25 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 			)
 		},
 		// Bootnodes
-		vec![],
+		vec![
+			MultiaddrWithPeerId::from_str("/dns/0.main.dracones.net/tcp/30333/p2p/12D3KooWPYmuJX6A34zbGgfs4av2Tnw1QUPNyguou7Eg9zbVufWk").unwrap(),
+		],
 		// Telemetry
 		None,
 		// Protocol ID
 		None,
 		// Properties
 		None,
-		None,
+		Some(
+			json!({
+				"ss58Format": 8387,
+				"tokenDecimals": 18,
+				"tokenSymbol": "FUCK"
+			})
+			.as_object()
+			.unwrap()
+			.clone(),
+		),
 		// Extensions
 		None,
 	))
