@@ -84,7 +84,7 @@ impl<B: BlockT> Verifier<B> for ManualSealVerifier {
 		block.post_digests.push(seal);
 		block.post_hash = Some(hash);
 
-		block.finalized = false;
+		block.finalized = true;
 		block.fork_choice = Some(ForkChoiceStrategy::LongestChain);
 		Ok((block, None))
 	}
