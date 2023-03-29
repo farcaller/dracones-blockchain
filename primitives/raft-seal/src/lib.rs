@@ -27,7 +27,7 @@ use sp_std::vec::Vec;
 pub mod digests;
 // pub mod inherents;
 
-pub const RAFT_KEY_TYPE: KeyTypeId = KeyTypeId(*b"acco");
+pub const RAFT_KEY_TYPE: KeyTypeId = KeyTypeId(*b"raft");
 
 pub mod sr25519 {
 	pub mod app_sr25519 {
